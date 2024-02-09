@@ -1,42 +1,33 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-
-def det2_2(m):
-    return m[0, 0] * m[1, 1] - m[0, 1]*m[1, 0]
-
-def inv2_2(m):
-    det = det2_2(m)
-    inv = np.array([[m[1,1], -m[0, 1]], [-m[1,0], m[0, 0]]])
-    return inv / det
+PI = 3.141592
 
 def norm_pdf_multivariate(x, mu, sigma):
-    det = det2_2(sigma)
-    size = len(x)
-    if det == 0:
-        raise NameError("The covariance matrix can't be singular")
-    norm_const = 1.0 / (np.power((2 * np.pi), float(size) / 2) * np.power(det, 1 / 2))
-    x_mu = x - mu
-    inv = inv2_2(sigma)
-    # Mirar como simplificar la multiplicacion de vector y matriz
-    result = np.exp(-0.5 * (x_mu.dot(inv).dot(x_mu.T)))
-    return norm_const * result
+    s1, s2, r = sigma
+    x1, x2 = x - mu
+    norm = s1**2 * s2**2 * (1 - r**2)
+    scale = 1/(2 * PI * np.sqrt(norm))
+    exp1 = -1 / (2 * norm)
+    exp2 = s2**2*x1**2-2*r*s1*s2*x1*x2+s1**2*x2**2
+    exp = np.exp(exp1*exp2)
+    return scale * exp
 
 
 biomas = {'bosque': {'mu': np.array((100, 100)),
-                     'sigma': np.array([[5000, 0], [0, 5000]]),
+                     'sigma': [10, 10, 0],
                      'valor': 0},
           'agua': {'mu': np.array((100, 20)),
-                   'sigma': np.array([[5000, 0], [0, 5000]]),
+                   'sigma': [25, 25, 0],
                    'valor': 1},
           'monte': {'mu': np.array((20, 100)),
-                    'sigma': np.array([[5000, 0], [0, 5000]]),
+                    'sigma': [20, 20, 0],
                     'valor': 2},
           'desert':{'mu': np.array((100, 180)),
-                    'sigma': np.array([[5000, 0], [0, 5000]]),
+                    'sigma': [25, 25, 0],
                     'valor': 3},
           'oscuro':{'mu': np.array((180, 100)),
-                    'sigma': np.array([[5000, 0], [0, 5000]]),
+                    'sigma': [20, 20, 0],
                     'valor': 4},
           }
 
